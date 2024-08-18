@@ -52,10 +52,6 @@ func main() {
 	for letter <= 'z' {
 
 		q.AddURL(site + "/players/" + string(letter) + "/")
-
-		if letter+1 == 'x' {
-			letter += 1
-		}
 		letter += 1
 	}
 	q.Run(c)

@@ -10,10 +10,10 @@ import (
 func NewCollyCollector(site string) (*colly.Collector, *queue.Queue) {
 	c := colly.NewCollector()
 
-	c.SetRequestTimeout(10 * time.Second)
+	c.SetRequestTimeout(12 * time.Second)
 	c.Limit(&colly.LimitRule{
 		DomainGlob:  "*",
-		Delay:       6 * time.Second,
+		Delay:       3 * time.Second,
 		RandomDelay: 1 * time.Second,
 		Parallelism: 1,
 	})
