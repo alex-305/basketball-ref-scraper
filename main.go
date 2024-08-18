@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"scrape/db"
+	"scrape/models"
 
 	"github.com/gocolly/colly/v2"
 )
@@ -11,18 +12,35 @@ import (
 func main() {
 	const site = "https://www.basketball-reference.com"
 
-	c := NewCollyCollector(site)
+	c, q := NewCollyCollector(site)
 	db := db.Connect()
 
 	c.OnHTML("table#players tbody", func(e *colly.HTMLElement) {
 		e.ForEach("tr th a", func(i int, a *colly.HTMLElement) {
 			href := a.Attr("href")
-			player := GetPlayer(site, href, a.Text)
-			err := db.InsertPlayer(player)
 
-			if err != nil {
-				log.Fatal(err)
+			link := site + href
+
+			player := models.Player{
+				Id:   getID(link),
+				Name: a.Text,
 			}
+
+			playerCollector := c.Clone()
+
+			playerCollector.OnHTML("#per_game > tbody", func(e *colly.HTMLElement) {
+				e.ForEach("tr", func(i int, h *colly.HTMLElement) {
+					player.Seasons = append(player.Seasons, getSeason(h, player.Id))
+				})
+				err := db.InsertPlayer(player)
+				if err != nil {
+					log.Fatal(err)
+				}
+			})
+			playerCollector.OnError(func(r *colly.Response, err error) {
+				fmt.Printf("Error:%s", err)
+			})
+			playerCollector.Visit(link)
 		})
 	})
 
@@ -33,11 +51,12 @@ func main() {
 	letter := 'a'
 	for letter <= 'z' {
 
-		c.Visit(site + "/players/" + string(letter) + "/")
+		q.AddURL(site + "/players/" + string(letter) + "/")
 
 		if letter+1 == 'x' {
 			letter += 1
 		}
 		letter += 1
 	}
+	q.Run(c)
 }

@@ -60,24 +60,3 @@ func getSeason(e *colly.HTMLElement, playerID string) models.Season {
 	}
 	return season
 }
-
-func GetPlayer(site, href, name string) models.Player {
-
-	c := NewCollyCollector(site)
-
-	link := site + href
-
-	player := models.Player{
-		Id:   getID(link),
-		Name: name,
-	}
-
-	c.OnHTML("#per_game > tbody", func(e *colly.HTMLElement) {
-		e.ForEach("tr", func(i int, h *colly.HTMLElement) {
-			player.Seasons = append(player.Seasons, getSeason(h, player.Id))
-		})
-	})
-	c.Visit(link)
-
-	return player
-}
