@@ -27,3 +27,8 @@ func (db *DB) CreateTables() {
 	db.CreatePlayerTable()
 	db.CreateSeasonTable()
 }
+
+func (db *DB) Disconnect() {
+	db.Exec(`DELETE FROM seasons WHERE ppg IS NULL;`)
+	db.Close()
+}

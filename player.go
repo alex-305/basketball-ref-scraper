@@ -37,37 +37,41 @@ func getIntStat(str string) int {
 	return int(stat)
 }
 
+func statToAttr(stat string) string {
+	return "td[data-stat=" + stat + "]"
+}
+
 func getSeason(e *colly.HTMLElement, playerID string) models.Season {
 	season := models.Season{}
 	season.TeamID = e.ChildText("td[data-stat=team_id] a")
 	season.PlayerID = playerID
 	season.Year = getYear(e.Attr("id"))
 
-	season.GamesPlayed = getIntStat(e.ChildText("td[data-stat=g]"))
-	season.Age = getIntStat(e.ChildText("td[data-stat=age]"))
-	mpg, err := getFloatStat("td[data-stat=mp_per_g]")
+	season.GamesPlayed = getIntStat(e.ChildText(statToAttr("g")))
+	season.Age = getIntStat(e.ChildText(statToAttr("age")))
+	mpg, err := getFloatStat(statToAttr("mp_per_g"))
 
 	if err != nil {
 		season.MinutesPlayed = &mpg
 	}
 
-	rpg, err := getFloatStat(e.ChildText("td[data-stat=trb_per_g]"))
+	rpg, err := getFloatStat(e.ChildText(statToAttr("trb_per_g")))
 	if err == nil {
 		season.ReboundsPerGame = &rpg
 	}
-	ppg, err := getFloatStat(e.ChildText("td[data-stat=pts_per_g]"))
+	ppg, err := getFloatStat(e.ChildText(statToAttr("pts_per_g")))
 	if err == nil {
 		season.PointsPerGame = &ppg
 	}
-	apg, err := getFloatStat(e.ChildText("td[data-stat=ast_per_g]"))
+	apg, err := getFloatStat(e.ChildText(statToAttr("ast_per_g")))
 	if err == nil {
 		season.AssistsPerGame = &apg
 	}
-	bpg, err := getFloatStat(e.ChildText("td[data-stat=blk_per_g]"))
+	bpg, err := getFloatStat(e.ChildText(statToAttr("blk_per_g")))
 	if err == nil {
 		season.BlocksPerGame = &bpg
 	}
-	spg, err := getFloatStat(e.ChildText("td[data-stat=stl_per_g]"))
+	spg, err := getFloatStat(e.ChildText(statToAttr("stl_per_g")))
 	if err == nil {
 		season.StealsPerGame = &spg
 	}

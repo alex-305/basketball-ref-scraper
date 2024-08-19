@@ -15,6 +15,8 @@ func main() {
 	c, q := NewCollyCollector(site)
 	db := db.Connect()
 
+	defer db.Disconnect()
+
 	c.OnHTML("table#players tbody", func(e *colly.HTMLElement) {
 		e.ForEach("tr th a", func(i int, a *colly.HTMLElement) {
 			href := a.Attr("href")
@@ -55,4 +57,5 @@ func main() {
 		letter += 1
 	}
 	q.Run(c)
+
 }
