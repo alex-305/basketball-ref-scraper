@@ -5,23 +5,13 @@ import (
 	"scrape/models"
 )
 
-type Season struct {
-	TeamID          string
-	PlayerID        string
-	PointsPerGame   float32
-	AssistsPerGame  float32
-	ReboundsPerGame float32
-	BlocksPerGame   float32
-	StealsPerGame   float32
-	Year            string
-}
-
 func (db *DB) CreateSeasonTable() {
 	stmt, err := db.Prepare(`
 	CREATE TABLE IF NOT EXISTS seasons (
 		"teamid" TEXT NOT NULL,
 		"playerid" TEXT NOT NULL,
 		"year" TEXT NOT NULL,
+		"gp" INTEGER,
 		"ppg" REAL,
 		"apg" REAL,
 		"rpg" REAL,
