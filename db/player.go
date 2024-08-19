@@ -37,7 +37,7 @@ func (db *DB) InsertPlayer(player models.Player) error {
 		}
 	}
 
-	log.Printf("Inserted %s into db", player.Name)
+	log.Printf("Inserted %s.", player.Name)
 
 	return nil
 }
