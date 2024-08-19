@@ -43,7 +43,7 @@ func statToAttr(stat string) string {
 
 func getSeason(e *colly.HTMLElement, playerID string) models.Season {
 	season := models.Season{}
-	season.TeamID = e.ChildText("td[data-stat=team_id] a")
+	season.TeamID = e.ChildText(statToAttr("team_id") + " a")
 	season.PlayerID = playerID
 	season.Year = getYear(e.Attr("id"))
 
