@@ -106,6 +106,8 @@ func getSeason(e *colly.HTMLElement, playerID string) models.Season {
 	season.Age = getIntStat(e.ChildText(statToAttr("age")))
 	mpg, err := getFloatStat(statToAttr("mp_per_g"))
 
+	season.Position = e.ChildText(statToAttr("pos"))
+
 	if err != nil {
 		season.MinutesPlayed = &mpg
 	}

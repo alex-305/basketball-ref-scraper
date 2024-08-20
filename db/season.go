@@ -11,6 +11,7 @@ func (db *DB) CreateSeasonTable() {
 		"teamid" TEXT NOT NULL,
 		"playerid" TEXT NOT NULL,
 		"year" TEXT NOT NULL,
+		"position" TEXT NOT NULL,
 		"gp" INTEGER,
 		"age" INTEGER,
 		"mp" REAL,
@@ -31,9 +32,9 @@ func (db *DB) CreateSeasonTable() {
 
 func (db *DB) InsertSeason(season models.Season) error {
 	query := `
-	INSERT OR REPLACE INTO seasons(teamid, playerid, year, ppg, apg, rpg, bpg, spg, gp, age, mp) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+	INSERT OR REPLACE INTO seasons(teamid, playerid, year, ppg, apg, rpg, bpg, spg, gp, age, mp, position) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
 	`
-	_, err := db.Exec(query, season.TeamID, season.PlayerID, season.Year, season.PointsPerGame, season.AssistsPerGame, season.ReboundsPerGame, season.BlocksPerGame, season.StealsPerGame, season.GamesPlayed, season.Age, season.MinutesPlayed)
+	_, err := db.Exec(query, season.TeamID, season.PlayerID, season.Year, season.PointsPerGame, season.AssistsPerGame, season.ReboundsPerGame, season.BlocksPerGame, season.StealsPerGame, season.GamesPlayed, season.Age, season.MinutesPlayed, season.Position)
 
 	if err != nil {
 		return err

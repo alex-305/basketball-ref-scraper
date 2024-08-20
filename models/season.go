@@ -12,4 +12,5 @@ type Season struct {
 	BlocksPerGame   *float32
 	StealsPerGame   *float32
 	Year            string
+	Position        string
 }
