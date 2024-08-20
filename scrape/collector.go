@@ -1,11 +1,19 @@
-package main
+package scrape
 
 import (
+	"log"
 	"time"
 
 	"github.com/gocolly/colly/v2"
 	"github.com/gocolly/colly/v2/queue"
 )
+
+func Start(site string) {
+	log.Printf("========Collecting teams========")
+	GetAllTeams(site)
+	log.Printf("========Collecting players========")
+	GetAllPlayers(site)
+}
 
 func NewCollyCollector(site string) (*colly.Collector, *queue.Queue) {
 	c := colly.NewCollector()

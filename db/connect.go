@@ -24,8 +24,10 @@ func Connect() DB {
 }
 
 func (db *DB) CreateTables() {
+	db.CreateTeamTable()
+	db.CreateTeamSeasonTable()
 	db.CreatePlayerTable()
-	db.CreateSeasonTable()
+	db.CreatePlayerSeasonTable()
 }
 
 func (db *DB) Disconnect() {

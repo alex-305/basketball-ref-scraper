@@ -1,18 +1,16 @@
-package main
+package scrape
 
 import (
 	"fmt"
 	"log"
-	"strconv"
-	"strings"
 
-	"scrape/db"
-	"scrape/models"
+	"github.com/alex-305/basketball-ref-scraper/db"
+	"github.com/alex-305/basketball-ref-scraper/models"
 
 	"github.com/gocolly/colly/v2"
 )
 
-func getAllPlayers(site string) {
+func GetAllPlayers(site string) {
 	c, q := NewCollyCollector(site)
 	db := db.Connect()
 
@@ -25,7 +23,7 @@ func getAllPlayers(site string) {
 			link := site + href
 
 			player := models.Player{
-				Id:   getID(link),
+				Id:   getPlayerIDFromHref(link),
 				Name: a.Text,
 			}
 
@@ -64,52 +62,20 @@ func getAllPlayers(site string) {
 	q.Run(c)
 }
 
-func getID(link string) string {
-	parts := strings.Split(link, "/")
-	last := parts[len(parts)-1]
-
-	return strings.TrimSuffix(last, ".html")
-}
-
-func getYear(id string) string {
-	parts := strings.Split(id, ".")
-	dateString := parts[len(parts)-1]
-
-	return dateString
-}
-
-func getFloatStat(str string) (float32, error) {
-	stat, err := strconv.ParseFloat(str, 32)
-
-	if err != nil {
-		return 0.0, err
-	}
-	return float32(stat), nil
-}
-
-func getIntStat(str string) int {
-	stat, _ := strconv.ParseInt(str, 10, 32)
-	return int(stat)
-}
-
-func statToAttr(stat string) string {
-	return "td[data-stat=" + stat + "]"
-}
-
-func getPlayerSeason(e *colly.HTMLElement, playerID string) (models.Season, bool) {
-	season := models.Season{}
+func getPlayerSeason(e *colly.HTMLElement, playerID string) (models.PlayerSeason, bool) {
+	season := models.PlayerSeason{}
 	league := e.ChildText(statToAttr("lg_id") + " a")
 	if league != "NBA" {
-		return models.Season{}, false
+		return models.PlayerSeason{}, false
 	}
 	season.TeamID = e.ChildText(statToAttr("team_id") + " a")
 
 	if season.TeamID == "" {
-		return models.Season{}, false
+		return models.PlayerSeason{}, false
 	}
 
 	season.PlayerID = playerID
-	season.Year = getYear(e.Attr("id"))
+	season.Year = getYearFromID(e.Attr("id"))
 
 	season.GamesPlayed = getIntStat(e.ChildText(statToAttr("g")))
 	season.Age = getIntStat(e.ChildText(statToAttr("age")))
@@ -124,7 +90,7 @@ func getPlayerSeason(e *colly.HTMLElement, playerID string) (models.Season, bool
 	ppg, err := getFloatStat(e.ChildText(statToAttr("pts_per_g")))
 
 	if err != nil {
-		return models.Season{}, false
+		return models.PlayerSeason{}, false
 	}
 	season.PointsPerGame = &ppg
 

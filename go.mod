@@ -1,4 +1,4 @@
-module scrape
+module github.com/alex-305/basketball-ref-scraper
 
 go 1.23.0
 
