@@ -61,5 +61,13 @@ func (db *DB) InsertTeam(team models.Team) error {
 }
 
 func (db *DB) InsertTeamSeason(season models.TeamSeason) error {
+	query := `
+	INSERT OR REPLACE INTO team_seasons(teamid, year, wins, losses) VALUES($1, $2, $3, $4)
+	`
+	_, err := db.Exec(query, season.TeamID, season.Year, season.Wins, season.Losses)
+
+	if err != nil {
+		return err
+	}
 	return nil
 }

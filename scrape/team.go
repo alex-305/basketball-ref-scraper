@@ -59,11 +59,15 @@ func getTeamSeason(e *colly.HTMLElement, teamID string) (models.TeamSeason, bool
 	season := models.TeamSeason{
 		TeamID: teamID,
 	}
-	yearHref := e.Attr(statToAttr("season") + " a href")
+	yearHref := e.ChildAttr("th[data-stat=season] a", "href")
 	season.Year = getYearFromHref(yearHref)
 
-	season.Wins = getIntStat(e.Attr(statToAttr("wins")))
-	season.Losses = getIntStat(e.Attr(statToAttr("losses")))
+	season.Wins = getIntStat(e.ChildText(statToAttr("wins")))
+	season.Losses = getIntStat(e.ChildText(statToAttr("losses")))
+
+	if season.Wins == 0 {
+		return season, false
+	}
 
 	return season, true
 }
