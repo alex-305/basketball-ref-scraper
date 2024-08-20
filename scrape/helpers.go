@@ -5,13 +5,6 @@ import (
 	"strings"
 )
 
-func getPlayerIDFromHref(href string) string {
-	parts := strings.Split(href, "/")
-	last := parts[len(parts)-1]
-
-	return strings.TrimSuffix(last, ".html")
-}
-
 func getTeamIDFromHref(href string) string {
 	parts := strings.Split(href, "/")
 	return parts[len(parts)-2]

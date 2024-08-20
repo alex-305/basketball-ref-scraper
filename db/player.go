@@ -10,7 +10,8 @@ func (db *DB) CreatePlayerTable() {
 	stmt, err := db.Prepare(`
 	CREATE TABLE IF NOT EXISTS players (
 		"id" TEXT NOT NULL PRIMARY KEY,
-		"name" TEXT NOT NULL
+		"name" TEXT NOT NULL,
+		"birthday" TEXT
 	);
 	`)
 
@@ -49,9 +50,9 @@ func (db *DB) CreatePlayerSeasonTable() {
 
 func (db *DB) InsertPlayer(player models.Player) error {
 	query := `
-	INSERT OR REPLACE INTO players(id, name) VALUES($1, $2);
+	INSERT OR REPLACE INTO players(id, name, birthday) VALUES($1, $2);
 	`
-	_, err := db.Exec(query, player.Id, player.Name)
+	_, err := db.Exec(query, player.Id, player.Name, player.BirthDate)
 
 	if err != nil {
 		return err

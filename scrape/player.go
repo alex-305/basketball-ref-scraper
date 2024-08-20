@@ -37,7 +37,7 @@ func GetAllPlayers(site string, db *db.DB) {
 					if padNum == 0 {
 						pad = ""
 					} else {
-						pad = string(pad)
+						pad = "_" + string(pad)
 					}
 					id = createPlayerID(player, pad)
 					padNum++
