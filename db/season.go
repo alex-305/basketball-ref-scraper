@@ -20,6 +20,7 @@ func (db *DB) CreateSeasonTable() {
 		"rpg" REAL,
 		"bpg" REAL,
 		"spg" REAL,
+		FOREIGN KEY(playerid) REFERENCES players(id),
 		PRIMARY KEY(year, teamid, playerid)
 	);
 	`)

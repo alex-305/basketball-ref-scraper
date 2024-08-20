@@ -33,9 +33,9 @@ func getAllPlayers(site string) {
 
 			playerCollector.OnHTML("#per_game > tbody", func(e *colly.HTMLElement) {
 				e.ForEach("tr", func(i int, h *colly.HTMLElement) {
-					season := getSeason(h, player.Id)
+					season, ok := getPlayerSeason(h, player.Id)
 
-					if season.PointsPerGame != nil && season.TeamID != "" {
+					if ok {
 						player.Seasons = append(player.Seasons, season)
 					}
 				})
@@ -96,9 +96,18 @@ func statToAttr(stat string) string {
 	return "td[data-stat=" + stat + "]"
 }
 
-func getSeason(e *colly.HTMLElement, playerID string) models.Season {
+func getPlayerSeason(e *colly.HTMLElement, playerID string) (models.Season, bool) {
 	season := models.Season{}
+	league := e.ChildText(statToAttr("lg_id") + " a")
+	if league != "NBA" {
+		return models.Season{}, false
+	}
 	season.TeamID = e.ChildText(statToAttr("team_id") + " a")
+
+	if season.TeamID == "" {
+		return models.Season{}, false
+	}
+
 	season.PlayerID = playerID
 	season.Year = getYear(e.Attr("id"))
 
@@ -112,13 +121,16 @@ func getSeason(e *colly.HTMLElement, playerID string) models.Season {
 		season.MinutesPlayed = &mpg
 	}
 
+	ppg, err := getFloatStat(e.ChildText(statToAttr("pts_per_g")))
+
+	if err != nil {
+		return models.Season{}, false
+	}
+	season.PointsPerGame = &ppg
+
 	rpg, err := getFloatStat(e.ChildText(statToAttr("trb_per_g")))
 	if err == nil {
 		season.ReboundsPerGame = &rpg
-	}
-	ppg, err := getFloatStat(e.ChildText(statToAttr("pts_per_g")))
-	if err == nil {
-		season.PointsPerGame = &ppg
 	}
 	apg, err := getFloatStat(e.ChildText(statToAttr("ast_per_g")))
 	if err == nil {
@@ -132,5 +144,5 @@ func getSeason(e *colly.HTMLElement, playerID string) models.Season {
 	if err == nil {
 		season.StealsPerGame = &spg
 	}
-	return season
+	return season, true
 }

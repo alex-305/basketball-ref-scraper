@@ -17,7 +17,7 @@ func Connect() DB {
 		log.Fatal(err)
 	}
 	db := DB{sqlDb}
-
+	db.Exec("PRAGMA foreign_keys = ON;")
 	db.CreateTables()
 
 	return db
