@@ -1,9 +1,10 @@
 package models
 
 type Player struct {
-	Id      string
-	Name    string
-	Seasons []PlayerSeason
+	Id        string
+	Name      string
+	Seasons   []PlayerSeason
+	BirthDate string
 }
 
 type PlayerSeason struct {

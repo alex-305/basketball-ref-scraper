@@ -69,6 +69,15 @@ func (db *DB) InsertPlayer(player models.Player) error {
 	return nil
 }
 
+func (db *DB) IDAvailable(id string) bool {
+	query := `
+	SELECT COUNT(*) FROM players WHERE id=$1;`
+	row := db.QueryRow(query, id)
+	var num int
+	row.Scan(&num)
+	return num == 0
+}
+
 func (db *DB) InsertPlayerSeason(season models.PlayerSeason) error {
 	query := `
 	INSERT OR REPLACE INTO player_seasons(teamid, playerid, year, ppg, apg, rpg, bpg, spg, gp, age, mp, position) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)

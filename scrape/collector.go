@@ -4,15 +4,16 @@ import (
 	"log"
 	"time"
 
+	"github.com/alex-305/basketball-ref-scraper/db"
 	"github.com/gocolly/colly/v2"
 	"github.com/gocolly/colly/v2/queue"
 )
 
-func Start(site string) {
+func Start(site string, db *db.DB) {
 	log.Printf("========Collecting teams========")
-	GetAllTeams(site)
+	GetAllTeams(site, db)
 	log.Printf("========Collecting players========")
-	GetAllPlayers(site)
+	GetAllPlayers(site, db)
 }
 
 func NewCollyCollector(site string) (*colly.Collector, *queue.Queue) {

@@ -3,6 +3,7 @@ package scrape
 import (
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/alex-305/basketball-ref-scraper/db"
 	"github.com/alex-305/basketball-ref-scraper/models"
@@ -10,11 +11,8 @@ import (
 	"github.com/gocolly/colly/v2"
 )
 
-func GetAllPlayers(site string) {
+func GetAllPlayers(site string, db *db.DB) {
 	c, q := NewCollyCollector(site)
-	db := db.Connect()
-
-	defer db.Disconnect()
 
 	c.OnHTML("table#players tbody", func(e *colly.HTMLElement) {
 		e.ForEach("tr th a", func(i int, a *colly.HTMLElement) {
@@ -23,13 +21,32 @@ func GetAllPlayers(site string) {
 			link := site + href
 
 			player := models.Player{
-				Id:   getPlayerIDFromHref(link),
-				Name: a.Text,
+				Name:      a.Text,
+				BirthDate: a.Text,
 			}
 
 			playerCollector := c.Clone()
 
-			playerCollector.OnHTML("#per_game > tbody", func(e *colly.HTMLElement) {
+			playerCollector.OnHTML("#necro-birth", func(e2 *colly.HTMLElement) {
+				player.BirthDate = e.Attr("data-birth")
+				var id string
+				firstLoop := true
+				padNum := 0
+				for db.IDAvailable(id) || firstLoop {
+					var pad string
+					if padNum == 0 {
+						pad = ""
+					} else {
+						pad = string(pad)
+					}
+					id = createPlayerID(player, pad)
+					padNum++
+					firstLoop = false
+				}
+				player.Id = id
+			})
+
+			playerCollector.OnHTML("#per_game > tbody", func(_ *colly.HTMLElement) {
 				e.ForEach("tr", func(i int, h *colly.HTMLElement) {
 					season, ok := getPlayerSeason(h, player.Id)
 
@@ -62,7 +79,14 @@ func GetAllPlayers(site string) {
 	q.Run(c)
 }
 
-func getPlayerSeason(e *colly.HTMLElement, playerID string) (models.PlayerSeason, bool) {
+func createPlayerID(player models.Player, pad string) string {
+	name := strings.ReplaceAll(player.Name, " ", "")
+	id := name + player.BirthDate
+
+	return id + pad
+}
+
+func getPlayerSeason(e *colly.HTMLElement, playerid string) (models.PlayerSeason, bool) {
 	season := models.PlayerSeason{}
 	league := e.ChildText(statToAttr("lg_id") + " a")
 	if league != "NBA" {
@@ -74,7 +98,7 @@ func getPlayerSeason(e *colly.HTMLElement, playerID string) (models.PlayerSeason
 		return models.PlayerSeason{}, false
 	}
 
-	season.PlayerID = playerID
+	season.PlayerID = playerid
 	season.Year = getYearFromID(e.Attr("id"))
 
 	season.GamesPlayed = getIntStat(e.ChildText(statToAttr("g")))

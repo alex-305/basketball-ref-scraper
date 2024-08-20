@@ -10,11 +10,8 @@ import (
 	"github.com/gocolly/colly/v2"
 )
 
-func GetAllTeams(site string) {
+func GetAllTeams(site string, db *db.DB) {
 	c, _ := NewCollyCollector(site)
-	db := db.Connect()
-
-	defer db.Disconnect()
 
 	c.OnHTML("table#teams_active tbody", func(e *colly.HTMLElement) {
 		e.ForEach("tr th a", func(i int, a *colly.HTMLElement) {

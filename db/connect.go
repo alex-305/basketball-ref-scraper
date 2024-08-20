@@ -11,7 +11,7 @@ type DB struct {
 	*sql.DB
 }
 
-func Connect() DB {
+func Connect() *DB {
 	sqlDb, err := sql.Open("sqlite3", "./nba.db")
 	if err != nil {
 		log.Fatal(err)
@@ -20,7 +20,7 @@ func Connect() DB {
 	db.Exec("PRAGMA foreign_keys = ON;")
 	db.CreateTables()
 
-	return db
+	return &db
 }
 
 func (db *DB) CreateTables() {
