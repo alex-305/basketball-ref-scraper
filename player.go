@@ -33,7 +33,11 @@ func getAllPlayers(site string) {
 
 			playerCollector.OnHTML("#per_game > tbody", func(e *colly.HTMLElement) {
 				e.ForEach("tr", func(i int, h *colly.HTMLElement) {
-					player.Seasons = append(player.Seasons, getSeason(h, player.Id))
+					season := getSeason(h, player.Id)
+
+					if season.PointsPerGame != nil && season.TeamID != "" {
+						player.Seasons = append(player.Seasons, season)
+					}
 				})
 				err := db.InsertPlayer(player)
 				if err != nil {
