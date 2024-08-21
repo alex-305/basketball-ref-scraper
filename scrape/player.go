@@ -78,9 +78,19 @@ func GetAllPlayers(site string, db *db.DB) {
 
 func createPlayerID(playerName string, pad int) string {
 	names := strings.Split(playerName, " ")
-	firstInitial := string(names[0][0])
 
-	id := firstInitial + names[1]
+	var firstInitial string
+	if len(names) > 0 {
+		firstInitial = string(names[0][0])
+	}
+
+	var id string
+	if len(names) > 1 {
+		id = firstInitial + names[1]
+	} else if len(names) > 0 {
+		id = names[0]
+	}
+
 	padStr := ""
 	if pad > 0 {
 		padStr += strconv.Itoa(pad)
