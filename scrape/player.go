@@ -3,6 +3,7 @@ package scrape
 import (
 	"fmt"
 	"log"
+	"strconv"
 	"strings"
 
 	"github.com/alex-305/basketball-ref-scraper/db"
@@ -20,30 +21,27 @@ func GetAllPlayers(site string, db *db.DB) {
 
 			link := site + href
 
+			name := a.Text
+
+			var id string
+			pad := 0
+			ok := false
+			for !ok {
+				id = createPlayerID(name, pad)
+				ok = db.IDAvailable(id)
+				pad++
+			}
+
 			player := models.Player{
 				Name:      a.Text,
 				BirthDate: a.Text,
+				Id:        id,
 			}
 
 			playerCollector := c.Clone()
 
 			playerCollector.OnHTML("#necro-birth", func(e2 *colly.HTMLElement) {
 				player.BirthDate = e.Attr("data-birth")
-				var id string
-				firstLoop := true
-				padNum := 0
-				for db.IDAvailable(id) || firstLoop {
-					var pad string
-					if padNum == 0 {
-						pad = ""
-					} else {
-						pad = "_" + string(pad)
-					}
-					id = createPlayerID(player, pad)
-					padNum++
-					firstLoop = false
-				}
-				player.Id = id
 			})
 
 			playerCollector.OnHTML("#per_game > tbody", func(_ *colly.HTMLElement) {
@@ -79,11 +77,17 @@ func GetAllPlayers(site string, db *db.DB) {
 	q.Run(c)
 }
 
-func createPlayerID(player models.Player, pad string) string {
-	name := strings.ReplaceAll(player.Name, " ", "")
-	id := name + player.BirthDate
+func createPlayerID(playerName string, pad int) string {
+	names := strings.Split(playerName, " ")
+	firstInitial := string(names[0][0])
 
-	return id + pad
+	id := firstInitial + names[1]
+	padStr := ""
+	if pad > 0 {
+		padStr += strconv.Itoa(pad)
+	}
+
+	return strings.ToLower(id + padStr)
 }
 
 func getPlayerSeason(e *colly.HTMLElement, playerid string) (models.PlayerSeason, bool) {

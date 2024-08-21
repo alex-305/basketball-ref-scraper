@@ -10,8 +10,8 @@ import (
 )
 
 func Start(site string, db *db.DB) {
-	log.Printf("========Collecting teams========")
-	GetAllTeams(site, db)
+	// log.Printf("========Collecting teams========")
+	// GetAllTeams(site, db)
 	log.Printf("========Collecting players========")
 	GetAllPlayers(site, db)
 }
