@@ -30,6 +30,8 @@ func GetAllTeams(site string, db *db.DB) {
 				e.ForEach("tr", func(i int, h *colly.HTMLElement) {
 					season, ok := getTeamSeason(h, team.Id)
 
+					log.Printf("Ok: %t", ok)
+
 					if ok {
 						team.Seasons = append(team.Seasons, season)
 					}

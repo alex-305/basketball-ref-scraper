@@ -43,10 +43,9 @@ func GetAllPlayers(site string, db *db.DB) {
 				player.BirthDate = e2.Attr("data-birth")
 			})
 
-			playerCollector.OnHTML("#per_game > tbody", func(_ *colly.HTMLElement) {
-				e.ForEach("tr", func(i int, h *colly.HTMLElement) {
-					season, ok := getPlayerSeason(h, player.Id)
-
+			playerCollector.OnHTML("#per_game > tbody", func(e2 *colly.HTMLElement) {
+				e2.ForEach("tr", func(i int, e3 *colly.HTMLElement) {
+					season, ok := getPlayerSeason(e3, player.Id)
 					if ok {
 						player.Seasons = append(player.Seasons, season)
 					}
