@@ -33,15 +33,14 @@ func GetAllPlayers(site string, db *db.DB) {
 			}
 
 			player := models.Player{
-				Name:      a.Text,
-				BirthDate: a.Text,
-				Id:        id,
+				Name: a.Text,
+				Id:   id,
 			}
 
 			playerCollector := c.Clone()
 
-			playerCollector.OnHTML("#necro-birth", func(e2 *colly.HTMLElement) {
-				player.BirthDate = e.Attr("data-birth")
+			playerCollector.OnHTML("span#necro-birth", func(e2 *colly.HTMLElement) {
+				player.BirthDate = e2.Attr("data-birth")
 			})
 
 			playerCollector.OnHTML("#per_game > tbody", func(_ *colly.HTMLElement) {
